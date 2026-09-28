@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Any-Repo Git Handbook — UX Documentation</title>
+<meta name="description" content="A plain-English, copy-paste guide for designers to connect Claude Desktop to any GitHub repo deployed on Netlify.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#F6F7F4;
+    --surface:#FFFFFF;
+    --surface-2:#EEF1EC;
+    --ink:#1E2723;
+    --ink-soft:#4B5650;
+    --ink-faint:#7C877F;
+    --accent:#0B6E52;
+    --accent-ink:#08503C;
+    --accent-soft:#E4F1EC;
+    --gold:#9C6B21;
+    --gold-soft:#FBF1DF;
+    --border:#DCE1DB;
+    --border-strong:#C3CBC3;
+    --code-ink:#0F3C2E;
+    --shadow: 0 1px 2px rgba(20,30,25,0.04), 0 6px 20px rgba(20,30,25,0.05);
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#11170F;
+      --surface:#182018;
+      --surface-2:#1F2A20;
+      --ink:#ECEEE9;
+      --ink-soft:#AEB8AC;
+      --ink-faint:#7E897F;
+      --accent:#4CC69A;
+      --accent-ink:#8FE0C0;
+      --accent-soft:#1B3A2D;
+      --gold:#E0B15C;
+      --gold-soft:#332811;
+      --border:#2B352C;
+      --border-strong:#3B473C;
+      --code-ink:#9FE8CB;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 24px rgba(0,0,0,0.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#11170F;
+    --surface:#182018;
+    --surface-2:#1F2A20;
+    --ink:#ECEEE9;
+    --ink-soft:#AEB8AC;
+    --ink-faint:#7E897F;
+    --accent:#4CC69A;
+    --accent-ink:#8FE0C0;
+    --accent-soft:#1B3A2D;
+    --gold:#E0B15C;
+    --gold-soft:#332811;
+    --border:#2B352C;
+    --border-strong:#3B473C;
+    --code-ink:#9FE8CB;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 6px 24px rgba(0,0,0,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{ background:var(--bg); }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', Georgia, serif;
+    color:var(--ink);
+    text-wrap:balance;
+    margin:0 0 .4em;
+  }
+  a{ color:var(--accent-ink); }
+  code, .mono{ font-family:'IBM Plex Mono', ui-monospace, monospace; }
+
+  .shell{
+    max-width:1180px;
+    margin:0 auto;
+    padding:56px 24px 96px;
+    display:grid;
+    grid-template-columns: 220px minmax(0,720px);
+    gap:64px;
+    justify-content:center;
+  }
+  @media (max-width: 980px){
+    .shell{ grid-template-columns: minmax(0,1fr); }
+    .toc{ display:none; }
+  }
+
+  .toc{ position:sticky; top:40px; align-self:start; font-size:13.5px; }
+  .toc-label{
+    text-transform:uppercase; letter-spacing:.08em; font-size:11px; font-weight:600;
+    color:var(--ink-faint); margin-bottom:14px;
+  }
+  .toc a{
+    display:block; color:var(--ink-soft); text-decoration:none;
+    padding:6px 0 6px 14px; border-left:2px solid var(--border); margin-bottom:1px;
+  }
+  .toc a:hover{ color:var(--accent-ink); border-left-color:var(--accent); }
+
+  main{ min-width:0; }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12.5px; font-weight:600; letter-spacing:.07em; text-transform:uppercase;
+    color:var(--accent-ink); background:var(--accent-soft); border-radius:999px;
+    padding:6px 14px; margin-bottom:22px;
+  }
+
+  h1.title{ font-size:clamp(30px,4.4vw,44px); font-weight:600; line-height:1.12; }
+  .subhead{ font-size:18px; color:var(--ink-soft); max-width:62ch; margin:14px 0 40px; }
+  .subhead strong{ color:var(--ink); font-weight:600; }
+
+  .diagram{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:28px 20px 22px; margin:0 0 48px; box-shadow:var(--shadow);
+  }
+  .diagram svg{ width:100%; height:auto; display:block; }
+  .diagram-caption{ text-align:center; font-size:13px; color:var(--ink-faint); margin-top:14px; }
+
+  section{ margin:64px 0; scroll-margin-top:28px; }
+  section > h2{
+    font-size:26px; font-weight:600; padding-bottom:14px;
+    border-bottom:1px solid var(--border); margin-bottom:26px;
+  }
+  .section-kicker{
+    font-size:13px; font-weight:600; color:var(--ink-faint);
+    text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px;
+  }
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+    padding-bottom:14px; border-bottom:1px solid var(--border); margin-bottom:26px;
+    flex-wrap:wrap;
+  }
+  .section-head h2{ padding-bottom:0; border-bottom:none; margin-bottom:0; }
+  .share-btn{ display:inline-flex; align-items:center; gap:6px; white-space:nowrap; }
+  .share-btn svg{ width:12px; height:12px; flex:none; }
+  p{ margin:0 0 16px; max-width:66ch; }
+  ul, ol{ padding-left:1.3em; margin:0 0 16px; max-width:64ch; }
+  li{ margin-bottom:8px; }
+
+  .cheatsheet{
+    background:var(--surface); border:1px solid var(--border); border-radius:14px;
+    overflow:hidden; box-shadow:var(--shadow);
+  }
+  .cheat-row{
+    display:grid; grid-template-columns: 1fr 1.4fr; gap:18px;
+    padding:16px 20px; border-bottom:1px solid var(--border); align-items:center;
+  }
+  .cheat-row:last-child{ border-bottom:none; }
+  .cheat-row:nth-child(odd){ background:var(--surface-2); }
+  .cheat-situation{ font-size:14.5px; color:var(--ink-soft); }
+  .cheat-phrase{
+    font-family:'IBM Plex Mono', monospace; font-size:13.5px; color:var(--code-ink);
+    background:var(--accent-soft); border-radius:8px; padding:8px 12px; display:inline-block;
+  }
+  @media (max-width:640px){ .cheat-row{ grid-template-columns:1fr; } }
+
+  .steps{ counter-reset: step; }
+  .step{ position:relative; padding-left:52px; margin-bottom:36px; }
+  .step::before{
+    counter-increment: step; content: counter(step);
+    position:absolute; left:0; top:0; width:34px; height:34px; border-radius:10px;
+    background:var(--accent); color:#fff; font-family:'Fraunces', serif; font-weight:600;
+    font-size:16px; display:flex; align-items:center; justify-content:center;
+  }
+  .step h3{ font-size:18.5px; margin-bottom:8px; }
+  .step p{ font-size:15px; color:var(--ink-soft); }
+  .step.browser::before{ background:var(--gold); }
+
+  .clickpath{
+    background:var(--gold-soft); border:1px solid color-mix(in srgb, var(--gold) 30%, var(--border));
+    border-radius:10px; padding:12px 16px; margin:12px 0; font-size:14.5px;
+  }
+  .clickpath .label{
+    font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+    color:var(--gold); display:block; margin-bottom:6px;
+  }
+  .clickpath .path{ font-family:'IBM Plex Mono', monospace; font-size:13.5px; color:var(--ink); }
+  .clickpath .path b{ color:var(--gold); }
+
+  .saythis{
+    background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent);
+    border-radius:10px; padding:14px 16px 14px 18px; margin:14px 0; box-shadow:var(--shadow);
+  }
+  .saythis-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; }
+  .saythis-label{
+    display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700;
+    letter-spacing:.07em; text-transform:uppercase; color:var(--accent-ink);
+  }
+  .copy-btn{
+    font-family:'IBM Plex Sans', sans-serif; font-size:12px; font-weight:600;
+    color:var(--ink-soft); background:var(--surface-2); border:1px solid var(--border);
+    border-radius:6px; padding:4px 10px; cursor:pointer;
+  }
+  .copy-btn:hover{ color:var(--accent-ink); border-color:var(--accent); }
+  .copy-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:1px; }
+  .saythis-text{ font-family:'IBM Plex Mono', monospace; font-size:14px; color:var(--ink); line-height:1.55; }
+  .saythis-note{ font-size:13px; color:var(--ink-faint); margin-top:8px; }
+
+  .callout{
+    background:var(--gold-soft); border:1px solid color-mix(in srgb, var(--gold) 35%, var(--border));
+    border-radius:12px; padding:16px 18px; margin:20px 0; font-size:14.5px;
+  }
+  .callout b{ color:var(--gold); }
+  .callout.done{ background:var(--accent-soft); border-color:color-mix(in srgb, var(--accent) 30%, var(--border)); }
+  .callout.done b{ color:var(--accent-ink); }
+
+  .glossary dt{
+    font-family:'IBM Plex Mono', monospace; font-weight:600; color:var(--accent-ink);
+    background:var(--accent-soft); display:inline-block; padding:3px 9px; border-radius:6px;
+    margin-top:20px; font-size:14px;
+  }
+  .glossary dd{ margin:8px 0 0; font-size:15px; color:var(--ink-soft); max-width:62ch; }
+
+  .trouble{
+    border:1px solid var(--border); border-radius:12px; padding:16px 18px;
+    margin-bottom:14px; background:var(--surface);
+  }
+  .trouble-q{ font-weight:600; font-size:15px; display:flex; gap:10px; align-items:flex-start; margin-bottom:6px; }
+  .trouble-q .qmark{ color:var(--accent); font-family:'Fraunces',serif; font-size:18px; line-height:1; }
+  .trouble-a{ font-size:14.5px; color:var(--ink-soft); margin-left:26px; }
+
+  .closing{ margin-top:72px; padding-top:32px; border-top:1px solid var(--border); font-size:14px; color:var(--ink-faint); }
+
+  ::selection{ background:var(--accent-soft); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <nav class="toc" aria-label="Table of contents">
+    <div class="toc-label">On this page</div>
+    <a href="#how-it-fits">How the pieces fit</a>
+    <a href="#setup">One-time setup</a>
+    <a href="#daily">Your daily loop</a>
+    <a href="#glossary">Glossary</a>
+    <a href="#trouble">If something looks wrong</a>
+  </nav>
+
+  <main>
+    <span class="eyebrow">For designers working in Claude Desktop — any project</span>
+    <h1 class="title">You never have to open Terminal.</h1>
+    <p class="subhead">
+      This is a general-purpose version of this guide — it doesn't assume any particular repo,
+      naming convention, or team setup. Use it for any project where you're connecting Claude
+      Desktop to a GitHub repository that deploys through Netlify. <strong>You still never learn
+      Git.</strong> You talk to Claude Desktop in plain English, and every phrase in a box below is
+      something you can copy, paste into chat, and send exactly as written — just swap in your own
+      project's names where noted.
+    </p>
+
+    <section id="how-it-fits">
+      <div class="diagram">
+        <svg viewBox="0 0 920 190" role="img" aria-labelledby="diagram-title">
+          <title id="diagram-title">You talk to Claude Desktop. Claude Desktop reads and writes the GitHub repo. Netlify watches the repo and builds a preview automatically.</title>
+          <defs>
+            <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-faint)"/>
+            </marker>
+          </defs>
+
+          <rect x="10" y="55" width="150" height="80" rx="14" fill="var(--surface-2)" stroke="var(--border-strong)"/>
+          <text x="85" y="90" text-anchor="middle" font-family="IBM Plex Sans" font-weight="600" font-size="15" fill="var(--ink)">You</text>
+          <text x="85" y="110" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="var(--ink-faint)">type a sentence</text>
+
+          <line x1="160" y1="95" x2="222" y2="95" stroke="var(--ink-faint)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <rect x="228" y="45" width="190" height="100" rx="14" fill="var(--accent-soft)" stroke="var(--accent)"/>
+          <text x="323" y="85" text-anchor="middle" font-family="Fraunces" font-weight="600" font-size="16" fill="var(--accent-ink)">Claude Desktop</text>
+          <text x="323" y="106" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="var(--accent-ink)">runs the Git commands</text>
+          <text x="323" y="122" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="var(--accent-ink)">for you, quietly</text>
+
+          <line x1="418" y1="95" x2="480" y2="95" stroke="var(--ink-faint)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <rect x="486" y="45" width="180" height="100" rx="14" fill="var(--surface-2)" stroke="var(--border-strong)"/>
+          <text x="576" y="85" text-anchor="middle" font-family="Fraunces" font-weight="600" font-size="16" fill="var(--ink)">GitHub</text>
+          <text x="576" y="106" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="var(--ink-faint)">the project's</text>
+          <text x="576" y="122" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="var(--ink-faint)">shared history</text>
+
+          <line x1="666" y1="95" x2="728" y2="95" stroke="var(--ink-faint)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+          <rect x="734" y="45" width="180" height="100" rx="14" fill="var(--gold-soft)" stroke="var(--gold)"/>
+          <text x="824" y="78" text-anchor="middle" font-family="Fraunces" font-weight="600" font-size="16" fill="var(--gold)">Netlify</text>
+          <text x="824" y="99" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="var(--ink-soft)">builds a live</text>
+          <text x="824" y="115" text-anchor="middle" font-family="IBM Plex Sans" font-size="11.5" fill="var(--ink-soft)">preview, automatically</text>
+
+          <text x="576" y="172" text-anchor="middle" font-family="IBM Plex Sans" font-size="11" fill="var(--ink-faint)" letter-spacing="0.02em">usually already watching this repo — confirm once with whoever owns the project</text>
+        </svg>
+        <div class="diagram-caption">Four boxes, one conversation. You only ever talk to the first one.</div>
+      </div>
+
+      <h2>How the pieces fit together</h2>
+      <p>
+        On most teams, two things are already wired up before you touch anything: the project's
+        code lives in a <b>GitHub repository</b> (a shared folder with a memory — every change,
+        ever), and <b>Netlify</b> is already connected to that repository, so new work pushed to it
+        gets a live, clickable preview automatically.
+      </p>
+      <p>
+        The one thing that's always yours to do is <b>connecting Claude Desktop to your project
+        folder</b>. Once that's done, everything else — making a branch, saving your work, checking
+        for other people's changes, getting a preview link — is a sentence you type into chat.
+      </p>
+      <div class="callout">
+        <b>The one rule to remember:</b> if a step ever sounds technical, it's not your step. It's
+        the sentence you say to Claude so <em>it</em> can do the technical part.
+      </div>
+    </section>
+
+    <section id="cheatsheet">
+      <div class="section-kicker">Quick reference</div>
+      <h2>The whole workflow, in one table</h2>
+      <p>Bookmark this. Everything below explains these in more depth, in order.</p>
+      <div class="cheatsheet">
+        <div class="cheat-row">
+          <div class="cheat-situation">Starting a new piece of work</div>
+          <div class="cheat-phrase">"Make a new branch called your-name/short-description from main and switch to it."</div>
+        </div>
+        <div class="cheat-row">
+          <div class="cheat-situation">Making sure you have everyone else's latest changes</div>
+          <div class="cheat-phrase">"Pull the latest changes from main."</div>
+        </div>
+        <div class="cheat-row">
+          <div class="cheat-situation">Saving your work so far</div>
+          <div class="cheat-phrase">"Commit everything and push it to your-name/short-description."</div>
+        </div>
+        <div class="cheat-row">
+          <div class="cheat-situation">Catching your branch up with everyone else's newer work</div>
+          <div class="cheat-phrase">"Rebase my branch on top of the latest main."</div>
+        </div>
+        <div class="cheat-row">
+          <div class="cheat-situation">Putting your work up for review</div>
+          <div class="cheat-phrase">"Open a pull request from my branch into main."</div>
+        </div>
+        <div class="cheat-row">
+          <div class="cheat-situation">Getting your live preview link</div>
+          <div class="cheat-phrase">"Has Netlify posted a preview link on my pull request yet?"</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="setup">
+      <div class="section-kicker">Part one</div>
+      <div class="section-head">
+        <h2>One-time setup</h2>
+        <button
+          class="copy-btn share-btn"
+          data-copy-hash="setup"
+          title="Copy a link straight to this section"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11.5 4.5"/>
+            <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.5 19.5"/>
+          </svg>
+          Copy link to this section
+        </button>
+      </div>
+      <p>You do this once, ever, per project. After today you'll never think about it again.</p>
+
+      <div class="steps">
+        <div class="step">
+          <h3>Get added to the GitHub repository</h3>
+          <p>
+            Ask whoever manages the project (your lead, or IT) to add your GitHub account as a
+            collaborator on the repo. You can't skip this — it's the guest list, and Claude can't
+            get you onto it.
+          </p>
+        </div>
+
+        <div class="step">
+          <h3>Make an empty folder and connect it to Claude Desktop</h3>
+          <p>
+            No app to install. Create a new, empty folder on your computer somewhere memorable —
+            like one called <code class="mono">Projects</code> — then, in Claude Desktop, open a
+            Cowork session and connect that folder. This is the only "wiring" step that's actually
+            yours to do — after this, Claude can read and write files in that project, and run the
+            Git commands on your behalf.
+          </p>
+        </div>
+
+        <div class="step">
+          <h3>Copy the repo's link from github.com</h3>
+          <p>
+            On the GitHub website, open the repo, click the green <b>&lt;&gt; Code</b> button, and
+            copy the HTTPS link — it looks like
+            <code class="mono">https://github.com/your-org/your-repo.git</code>.
+          </p>
+        </div>
+
+        <div class="step">
+          <h3>Have Claude clone it into your folder</h3>
+          <p>
+            Paste the link into chat and ask Claude to clone it — that just means "download a real,
+            connected working copy of the project" into the folder you just connected.
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="Clone https://github.com/your-org/your-repo.git into this folder.">Copy</button>
+            </div>
+            <div class="saythis-text">"Clone https://github.com/your-org/your-repo.git into this folder."</div>
+            <div class="saythis-note">
+              Private repo and Claude can't get in? On GitHub, go to <b>Settings → Developer
+              settings → Personal access tokens</b>, generate one, and paste it in when Claude asks
+              — a one-time step.
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>Say hello and check it worked</h3>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="What branch am I on, and is my folder connected to the GitHub repo correctly?">Copy</button>
+            </div>
+            <div class="saythis-text">"What branch am I on, and is my folder connected to the GitHub repo correctly?"</div>
+          </div>
+          <p class="saythis-note">
+            If Claude answers with a real branch name (usually <code class="mono">main</code>), you're
+            connected. If it says the folder isn't a Git repository, go back a step — the clone
+            didn't finish, or you connected the wrong folder.
+          </p>
+        </div>
+
+        <div class="step">
+          <h3>Check whether Netlify is already connected</h3>
+          <p>
+            On most existing projects, someone already did this before you arrived — that's the
+            common case.
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="Is there a netlify.toml file in this project, and can you tell if Netlify is already connected to this repo?">Copy</button>
+            </div>
+            <div class="saythis-text">"Is there a netlify.toml file in this project, and can you tell if Netlify is already connected to this repo?"</div>
+          </div>
+          <p class="saythis-note">
+            Already connected? Skip ahead to <a href="#daily">Your daily loop</a> — you're done
+            here. Not connected yet? Keep going — the rest of this section walks you through
+            setting it up yourself, once.
+          </p>
+        </div>
+
+        <div class="callout">
+          <b>From here, it happens in your browser, not in chat.</b> Signing into Netlify and
+          authorizing GitHub access are things only you can click — Claude can prepare and push
+          your code, but it can't log in on your behalf. About five minutes, once, and then it's
+          permanent.
+        </div>
+
+        <div class="step browser">
+          <h3>Log in to Netlify</h3>
+          <p>
+            Go to <code class="mono">netlify.com</code>. If your team already has an account, log
+            into that one; otherwise sign up — "Continue with GitHub" is the fastest option and
+            uses the account you already have.
+          </p>
+        </div>
+
+        <div class="step browser">
+          <h3>Start a new site from your repo</h3>
+          <div class="clickpath">
+            <span class="label">Click this path</span>
+            <span class="path">Add new site → <b>Import an existing project</b></span>
+          </div>
+        </div>
+
+        <div class="step browser">
+          <h3>Choose GitHub as the source</h3>
+          <p>
+            The first time you do this, Netlify will ask permission to access your repositories —
+            click <b>Authorize</b>. If your repo doesn't show up afterward, its GitHub access may
+            be scoped to only some repos — look for <b>"Configure the Netlify GitHub App"</b> in
+            that same picker and grant it access to this one too.
+          </p>
+        </div>
+
+        <div class="step browser">
+          <h3>Pick your repository</h3>
+          <p>Find it in the list and select it.</p>
+        </div>
+
+        <div class="step browser">
+          <h3>Confirm the build settings</h3>
+          <p>
+            Netlify usually guesses these correctly. If you're not sure what to put in the
+            <b>build command</b> or <b>publish directory</b> fields, ask Claude first.
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="What's the build command and publish directory for this project, so I can enter them in Netlify?">Copy</button>
+            </div>
+            <div class="saythis-text">"What's the build command and publish directory for this project, so I can enter them in Netlify?"</div>
+          </div>
+        </div>
+
+        <div class="step browser">
+          <h3>Deploy</h3>
+          <div class="clickpath">
+            <span class="label">Click this</span>
+            <span class="path"><b>Deploy site</b></span>
+          </div>
+          <p>
+            Netlify hands you a live URL right away (something like
+            <code class="mono">happy-lovelace-123.netlify.app</code>) and starts the first build.
+          </p>
+        </div>
+
+        <div class="callout done">
+          <b>Done — and it stays done.</b> That connection is now permanent. Every time you (or
+          Claude, on your behalf) push to GitHub or open a pull request, Netlify rebuilds and
+          updates the live site on its own. You will never need to click "deploy" again.
+        </div>
+      </div>
+    </section>
+
+    <section id="daily">
+      <div class="section-kicker">Part two</div>
+      <h2>Your daily loop</h2>
+      <p>
+        This is the part you'll actually repeat, project after project. Each step is one sentence.
+      </p>
+
+      <div class="steps">
+        <div class="step">
+          <h3>Start today's work on its own branch</h3>
+          <p>
+            A <b>branch</b> is your own private copy of the project to make changes in — nobody
+            else's work moves until you decide to bring yours back in. Ask your team what naming
+            convention they use (some teams use <code class="mono">yourname/thing</code>, others use
+            <code class="mono">feature/thing</code> — either is fine, just be consistent).
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="Make a new branch called jill/onboarding-screens from main and switch to it.">Copy</button>
+            </div>
+            <div class="saythis-text">"Make a new branch called jill/onboarding-screens from main and switch to it."</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>Pull in everyone else's latest changes</h3>
+          <p>
+            Do this at the start of every session, before you start editing — especially if it's
+            been more than a day. This makes sure you're building on top of the newest version of
+            <code class="mono">main</code>, not an old one.
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="Pull the latest changes from main.">Copy</button>
+            </div>
+            <div class="saythis-text">"Pull the latest changes from main."</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>Build your thing</h3>
+          <p>
+            This is the actual design/dev work — describe the screen, component, or change you
+            want, and Claude builds it in the project. If this team uses feature flags, ask what the
+            convention is before you start; if not, don't worry about it.
+          </p>
+        </div>
+
+        <div class="step">
+          <h3>Have Claude check your work</h3>
+          <p>
+            Before you save anything, ask it to run whatever checks this project has — the exact
+            names vary by project, so let Claude find them.
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="Find and run this project's tests, type checks, and linter, and tell me if anything fails.">Copy</button>
+            </div>
+            <div class="saythis-text">"Find and run this project's tests, type checks, and linter, and tell me if anything fails."</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>Save your work and send it up</h3>
+          <p>
+            A <b>commit</b> is a labeled save point — a snapshot of what changed, with a short note
+            about why. A <b>push</b> sends that snapshot from your computer up to GitHub, where
+            Netlify can see it. You almost always do both in the same breath.
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="Commit everything and push it to jill/onboarding-screens.">Copy</button>
+            </div>
+            <div class="saythis-text">"Commit everything and push it to jill/onboarding-screens."</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>If your branch has fallen behind, catch it up</h3>
+          <p>
+            While you were working, other people may have pushed their own changes to
+            <code class="mono">main</code>. If Claude ever mentions your branch is "behind," or if
+            you're about to open a pull request and want a clean history, ask for a <b>rebase</b> —
+            it replays your changes on top of the newest <code class="mono">main</code>, so your
+            branch looks like it started from today, not last week.
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="Rebase my branch on top of the latest main.">Copy</button>
+            </div>
+            <div class="saythis-text">"Rebase my branch on top of the latest main."</div>
+            <div class="saythis-note">
+              If two people changed the same lines, Claude will flag a <b>conflict</b> and ask you
+              which version to keep. That's normal — see "If something looks wrong" below.
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>Open a pull request</h3>
+          <p>
+            A <b>pull request</b> (or "PR") is the formal ask to bring your branch's changes into
+            <code class="mono">main</code> — it's where your team reviews and comments before
+            anything merges. Most projects on GitHub + Netlify auto-post a "Deploy Preview" comment
+            on the pull request within a minute or two of you opening it.
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="Open a pull request from jill/onboarding-screens into main, with a short description of what changed.">Copy</button>
+            </div>
+            <div class="saythis-text">"Open a pull request from jill/onboarding-screens into main, with a short description of what changed."</div>
+          </div>
+        </div>
+
+        <div class="step">
+          <h3>Get your preview link and share it</h3>
+          <p>
+            Check the pull request page on GitHub for a comment from the Netlify bot — that comment
+            holds your live "Deploy Preview" link. Share that link (and the pull request itself)
+            with whoever needs to look at your work.
+          </p>
+          <div class="saythis">
+            <div class="saythis-head">
+              <span class="saythis-label">Say this to Claude</span>
+              <button class="copy-btn" data-copy="Has Netlify posted a preview link on my pull request yet? If so, what's the link?">Copy</button>
+            </div>
+            <div class="saythis-text">"Has Netlify posted a preview link on my pull request yet? If so, what's the link?"</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <b>What you'll never do:</b> open Terminal, type <code class="mono">git</code> anything
+        yourself, or run the site on your own computer to see your changes. The deploy preview
+        <em>is</em> your preview.
+      </div>
+    </section>
+
+    <section id="glossary">
+      <div class="section-kicker">Plain-English dictionary</div>
+      <h2>The words that matter</h2>
+      <dl class="glossary">
+        <dt>repo</dt>
+        <dd>Short for "repository" — the shared project folder, plus its entire history of changes. Lives on GitHub.</dd>
+
+        <dt>branch</dt>
+        <dd>Your own private copy of the project to work in. Changes on your branch don't affect anyone else's until you bring them together.</dd>
+
+        <dt>commit</dt>
+        <dd>A labeled save point — a snapshot of exactly what changed and why, at that moment.</dd>
+
+        <dt>push / pull</dt>
+        <dd><b>Push</b> sends your saved snapshots up to GitHub. <b>Pull</b> brings other people's snapshots down to you. Same road, opposite directions.</dd>
+
+        <dt>rebase</dt>
+        <dd>Replays your changes on top of the newest version of <code class="mono">main</code>, so your branch's history reads cleanly, as if you'd started today.</dd>
+
+        <dt>merge conflict</dt>
+        <dd>Two people changed the exact same lines. Nothing is broken — Claude will show you both versions and ask which one to keep.</dd>
+
+        <dt>main</dt>
+        <dd>The one branch that represents "the real, current project." Everyone's work eventually joins back into it.</dd>
+
+        <dt>pull request (PR)</dt>
+        <dd>A formal request to merge your branch into <code class="mono">main</code> — the place your team reviews, comments, and approves before anything ships.</dd>
+
+        <dt>Netlify build / deploy preview</dt>
+        <dd>Every time a branch is pushed (and usually when a pull request opens), Netlify automatically assembles it into a real, clickable website — that link is your preview.</dd>
+      </dl>
+    </section>
+
+    <section id="trouble">
+      <div class="section-kicker">When something looks wrong</div>
+      <h2>You didn't break it</h2>
+
+      <div class="trouble">
+        <div class="trouble-q"><span class="qmark">?</span> Claude says there's a "merge conflict." Did I break something?</div>
+        <div class="trouble-a">No — it means two people edited the same lines, and Claude wants a human decision. Ask it: <em>"Explain the conflict in plain English, and show me both versions."</em> Then just tell it which one to keep, or how to combine them.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="trouble-q"><span class="qmark">?</span> I opened a pull request, but there's no preview link yet.</div>
+        <div class="trouble-a">Builds usually take a minute or two. Ask: <em>"Is the Netlify build for my pull request still running, or did it fail?"</em> If it never shows up at all, this repo may not be connected to Netlify yet — see <a href="#setup">One-time setup</a> above and connect it.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="trouble-q"><span class="qmark">?</span> My branch says it's "behind main" — is that bad?</div>
+        <div class="trouble-a">It just means someone else pushed changes after you started. It's completely normal. Ask Claude to rebase (see above) whenever you notice it, or right before you open your pull request.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="trouble-q"><span class="qmark">?</span> I think I asked for the wrong thing and now something's messed up.</div>
+        <div class="trouble-a">Git almost never actually loses work. Say: <em>"Something looks wrong — don't push or delete anything, just tell me what state my branch is in."</em> Claude can look before it touches anything.</div>
+      </div>
+
+      <div class="trouble">
+        <div class="trouble-q"><span class="qmark">?</span> Do I ever need to touch GitHub.com directly?</div>
+        <div class="trouble-a">Rarely. The main reasons are getting added as a collaborator at the start, and sometimes reading a review comment someone left on your pull request. Everything else goes through chat.</div>
+      </div>
+    </section>
+
+    <p class="closing">
+      Every team names branches a little differently and runs slightly different checks — when in
+      doubt, ask Claude to look at the project first (<em>"how does this project usually name
+      branches, and what commands does it run to check code?"</em>) rather than guessing.
+    </p>
+  </main>
+</div>
+
+<script>
+  document.querySelectorAll('.copy-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var hash = btn.getAttribute('data-copy-hash');
+      var text = hash
+        ? (location.origin + location.pathname + '#' + hash)
+        : (btn.getAttribute('data-copy') || '');
+      var original = btn.innerHTML;
+      var revert = function(label){
+        btn.textContent = label;
+        setTimeout(function(){ btn.innerHTML = original; }, 1400);
+      };
+      try{
+        navigator.clipboard.writeText(text).then(function(){
+          revert('Copied');
+        }).catch(function(){
+          revert('Select & copy');
+        });
+      }catch(e){
+        revert('Select & copy');
+      }
+    });
+  });
+</script>
+</body>
+</html>
